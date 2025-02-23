@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Salud Farma - Productos en Tiempo Real</title>
+<link rel="stylesheet" href="/styles.css"> 
+</head>
+<body>
+<h1>Productos en Tiempo Real</h1>
+
+
+<ul id="productList">
+{{#each productos}}
+    <li data-id="{{this.id}}">{{this.nombre}} - ${{this.precio}} <button class="deleteBtn">Eliminar</button></li>
+{{/each}}
+</ul>
+
+<!-- Agregar productos -->
+<form id="productForm">
+<input type="text" name="nombre" placeholder="Nombre del medicamento" required>
+<input type="number" name="precio" placeholder="Precio" required>
+<button type="submit">Agregar</button>
+</form>
+
+<!-- Conexión a Socket.IO -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+
+// Actualizar productos
+socket.on('updateProducts', (productos) => {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+    productos.forEach((p) => {
+    productList.innerHTML += `<li data-id="${p.id}">${p.nombre} - $${p.precio} <button class="deleteBtn">Eliminar</button></li>`;
+    });
+    attachDeleteListeners(); 
+});
+
+// Enviar nuevo producto
+document.getElementById('productForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = e.target.nombre.value;
+    const precio = parseFloat(e.target.precio.value);
+    socket.emit('addProduct', { nombre, precio });
+    e.target.reset(); // Limpiar
+});
+
+// Eliminar producto
+function attachDeleteListeners() {
+    document.querySelectorAll('.deleteBtn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+        const id = parseInt(btn.parentElement.getAttribute('data-id'));
+        socket.emit('deleteProduct', id);
+    });
+    });
+}
+attachDeleteListeners(); 
+</script>
+</body>
+</html>

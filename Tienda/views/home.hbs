@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Salud Farma - Home</title>
+<link rel="stylesheet" href="/Tienda/public/styles.css"> 
+</head>
+<body>
+<h1>Lista de Medicamentos</h1>
+<ul>
+{{#each productos}}
+    <li>{{this.nombre}} - ${{this.precio}}</li>
+{{/each}}
+</ul>
+</body>
+</html>
